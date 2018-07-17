@@ -1,0 +1,39 @@
+#!/usr/bin/python3
+from flask import Flask, jsonify, request, make_response
+from datetime import datetime
+import json
+
+app = Flask(__name__)
+
+def logar_acessos():
+    with open('Log.txt', 'r') as f:
+        contador = f.read()
+        contador = 1 if not contador else int(contador) +1
+        #if contador == '':
+        #    contador = 1
+        #else:
+        #    contador = int(contador) + 1 
+    with open('Log.txt', 'w') as f:
+        f.write(str(contador))
+        return contador
+
+@app.route('/')
+def home():
+    contador = logar_acessos() 
+    return jsonify({'Acessos' : contador})
+
+@app.route('/acessos')
+def acessos():
+    logar_acessos()
+    date = datetime.now().strftime('%Y-%m-%d %H:%I:%S')
+    return jsonify({'Data' : date} , {'Counter' : '0'})
+
+
+@app.route('/celular', methods=['POST', 'GET'])
+def celular():
+#    return jsonify(request.get_json())
+    retorno = json.dumps({'status' : 'Não encontrado'})
+    headers = {'Content-Type' : 'application/json'}
+    return make_response(retorno, 404, headers)
+
+app.run(host='0.0.0.0', debug=True)
