@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 
 from blueprints.usuario import usuario
 
@@ -8,7 +8,7 @@ app.register_blueprint(usuario)
 
 @app.route('/')
 def home():
-    return jsonify({'status' : 'Running'})
+    return render_template('index.html', title='Home')
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -2,7 +2,7 @@
 
 import json
 from config.mongo import db
-from flask import Blueprint, jsonify, request, make_response
+from flask import Blueprint, jsonify, request, make_response, Response, render_template
 from bson.json_util import dumps as bdumps
 
 #app = Flask()
@@ -11,7 +11,9 @@ usuario = Blueprint('usuarios', __name__)
 @usuario.route('/usuarios',  methods=['GET','POST'])
 def usuarios():
     if request.method == 'GET':
-        return jsonify([json.loads(bdumps(u)) for u in db.usuarios.find()])
+        #return Response(bdumps(db.usuarios.find()), content_type='application/json')
+        rs = [u for u in db.usuarios.find()]
+        return render_template('usuarios.html', usuarios=rs)
     else:
         usuario = request.get_json()
         keys = usuario.keys()
@@ -24,3 +26,10 @@ def usuarios():
         #    return make_response(jsonify({'message' : 'Propriedade email obrigatória'}), 400)
         db.usuarios.insert(usuario)
         return jsonify({'message' : 'Usuario cadastrado com sucesso!'})
+
+@usuario.route('/usuarios/delete', methods=['POST'])
+def delete_usuarios():
+    email = request.args.get('email')
+    db.usuarios.remove({'email' : email})
+    rs = [u for u in db.usuarios.find()]
+    return render_template('usuarios.html', usuarios=rs)
